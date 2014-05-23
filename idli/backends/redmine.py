@@ -18,9 +18,6 @@ class HttpRequestException(Exception):
         self.status_code = status_code
         self.body = body
 
-    def __unicode__(self):
-        return "HttpError: " + str(self.status_code) + ", " + str(self.value) + ", " + str(self.body)
-
     def __str__(self):
         return "HttpError: " + str(self.status_code) + ", " + str(self.value) + ", " + self.body
 
@@ -116,10 +113,10 @@ class RedmineBackend(idli.Backend):
             issues = [i for i in issues if tag in i.tags]
         return issues
 
-    DATE_FORMAT = '%Y/%m/%d %H:%M:%S'
+    DATE_FORMAT = '%Y-%m-%dT%H:%M:%S'
     def __parse_date(self, d):
-        tz_delta = datetime.timedelta(hours=int(d[-6:])/100)
-        return datetime.datetime.strptime(d[0:19], self.DATE_FORMAT) + tz_delta
+        #tz_delta = datetime.timedelta(hours=int(d[-6:])/100) ???
+        return datetime.datetime.strptime(d[0:19], self.DATE_FORMAT)# + tz_delta
 
     def __parse_issue(self, i):
         issue = idli.Issue(i['subject'], i['description'], i['id'], i['author']['name'], status=i['status']['name'], create_time=self.__parse_date(i['created_on']))
@@ -146,7 +143,7 @@ class RedmineBackend(idli.Backend):
         response = requests.get(self.base_url() + suffix, auth=auth, params=params, headers=headers)
         if (response.status_code - (response.status_code % 100)) != 200: #200 responses are all legitimate
             raise HttpRequestException("HTTP error", response.status_code, response.content)
-        return response.content
+        return response.content.decode('utf-8')
 
 
     STATUS_CHECK_INTERVAL = 60*60
@@ -164,9 +161,13 @@ class RedmineBackend(idli.Backend):
             pass
         try:
             result = json.loads(self.__url_request("/issue_statuses.json"))
-            cfg.set_config_value(self.config_section, "last_status_list", json.dumps(result), global_val=False)
-            cfg.set_config_value(self.config_section, "last_status_list_time", time.time())
-            idli.set_status_mapping(result)
+            statuses_list = result['issue_statuses']
+            statuses = {}
+            for s in statuses_list:
+                statuses[s['name'].lower()] = not ('is_closed' in s and s['is_closed'])
+            cfg.set_config_value(self.config_section, "last_status_list", json.dumps(statuses), global_val=False)
+            cfg.set_config_value(self.config_section, "last_status_list_time", str(time.time()))
+            idli.set_status_mapping(statuses)
         except HttpRequestException as e:
             mapping = { 'New' : True, 'Closed' : False, 'In Progress' : True, 'Rejected' : False, 'Resolved' : False, 'Feedback' : True }
             cfg.set_config_value(self.config_section, "last_status_list", json.dumps(mapping), global_val=False)

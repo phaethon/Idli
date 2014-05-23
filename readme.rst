@@ -217,11 +217,13 @@ Lastly, xmlrpc permissions must be given to authenticated users::
     $ trac-admin TRAC_DIRECTORY permission add authenticated XML_RPC
 
 Setting up redmine
-~~~~~~~~~~~~~~~~~~
+------------------
 You should enable setting Enable REST web service under Administration/Settings/Authentication.
 This will enable showing API access key under My Account. 
 Creating new project:
+
     $ idli init redmine https://url.to.repo APIKEY PROJECT_ID USERNAME
+    
 As there is no default tagging mechanism in Redmine, tagging does not work. 
 
 Adding new backends

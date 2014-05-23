@@ -134,7 +134,7 @@ class RedmineBackend(idli.Backend):
             response = requests.put(self.base_url() + suffix, auth=auth, data=json.dumps(data), headers=headers)
         if (response.status_code - (response.status_code % 100)) != 200: #200 responses are all legitimate
             raise HttpRequestException("HTTP error", response.status_code, response.content)
-        return response.content
+        return response.content.decode('utf-8')
 
 
     def __url_request(self, suffix, params={}):

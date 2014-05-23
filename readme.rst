@@ -8,7 +8,7 @@ A command line bug tracker interface
 Introduction
 ============
 
-This for of idli is updated for Python 3 and latest version of Redmine.
+This fork of idli is updated for Python 3 and latest version of Redmine.
 
 Idli is a command line interface to bug tracking tools. The goal is simple. To
 add a bug to a project, you can visit your bug tracker's website and use the web

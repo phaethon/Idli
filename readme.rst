@@ -216,11 +216,11 @@ Lastly, xmlrpc permissions must be given to authenticated users::
 
     $ trac-admin TRAC_DIRECTORY permission add authenticated XML_RPC
 
-Setting up redmine
+Redmine
 ------------------
 You should enable setting Enable REST web service under Administration/Settings/Authentication.
 This will enable showing API access key under My Account. 
-Creating new project:
+Creating new project::
 
     $ idli init redmine https://url.to.repo APIKEY PROJECT_ID USERNAME
     

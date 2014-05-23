@@ -30,31 +30,31 @@ def static_method(meth):
     return smeth
 
 def print_issue(issue, comments):
-    print "ID: " + issue.id
-    print "Title: " + issue.title
-    print "Creator: " + issue.creator
-    print "Create time: " + str(issue.create_time)
-    print "Open: " + str(issue.status)
+    print("ID: " + issue.id)
+    print("Title: " + issue.title)
+    print("Creator: " + issue.creator)
+    print("Create time: " + str(issue.create_time))
+    print("Open: " + str(issue.status))
     if not (issue.owner is None):
-        print "Owner: " + str(issue.owner)
+        print("Owner: " + str(issue.owner))
     if (issue.tags):
-        print "Tags: " + ", ".join(issue.tags)
-    print
-    print issue.body
-    print
+        print("Tags: " + ", ".join(issue.tags))
+    print()
+    print(issue.body)
+    print()
 
     if len(comments) > 0:
-        print "Comments:"
+        print("Comments:")
     for c in comments:
-        print
+        print()
         if (c.title != "") and (not (c.title is None)):
-            print "    Comment: " + str(c.title.__class__)
-        print "    Author: " + c.creator
-        print "    Date: " + str(c.date)
-        print
-        print "    " + c.body.replace("\n", "\n    ")
+            print("    Comment: " + str(c.title.__class__))
+        print("    Author: " + c.creator)
+        print("    Date: " + str(c.date))
+        print()
+        print("    " + c.body.replace("\n", "\n    "))
 
 if __name__ == "__main__":
     result, es = get_string_from_editor("test\n\ntest 2 \n")
-    print (result, es)
+    print((result, es))
 

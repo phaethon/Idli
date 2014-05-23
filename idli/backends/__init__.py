@@ -1,6 +1,6 @@
-import github
-import trac
-import redmine
+from . import github
+from . import trac
+from . import redmine
 import sys
 import idli.config as cfg
 from idli.commands import configure_subparser, init_subparser
@@ -18,7 +18,7 @@ def register_backend(backend):
 
 def __add_items_to_parser(items, parser):
     if items.__class__ == dict:
-        for (cmd, help) in items.iteritems():
+        for (cmd, help) in items.items():
             parser.add_argument(cmd, help=help)
     if items.__class__ == list:
         for (cmd, help) in items:
@@ -29,14 +29,14 @@ def get_backend_or_fail(backend_name = None):
     try:
         backend_name = backend_name or cfg.get_config_value("project", "type").lower()
         return backend_list[backend_name]
-    except cfg.IdliMissingConfigException, e:
-        print "Could not find idli configuration file. Run 'idli init' in the project root directory."
+    except cfg.IdliMissingConfigException as e:
+        print("Could not find idli configuration file. Run 'idli init' in the project root directory.")
         sys.exit(0)
-    except KeyError, e:
-        print "No such backend '" + cfg.get_config_value("project", "type") + ". Check the configuration file " + cfg.local_config_filename() + " for errors."
+    except KeyError as e:
+        print("No such backend '" + cfg.get_config_value("project", "type") + ". Check the configuration file " + cfg.local_config_filename() + " for errors.")
         sys.exit(0)
-    except Exception, e:
-        print "Failed: " + str(e)
+    except Exception as e:
+        print("Failed: " + str(e))
         sys.exit(0)
 
 register_backend(github.GithubBackend)

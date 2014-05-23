@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 from datetime import datetime
-import xmlrpclib
+import xmlrpc.client
 import socket
 
 import idli
@@ -15,17 +15,17 @@ def catch_socket_errors(func):
     def __wrapped(*args, **kwargs):
         try:
             return func(*args, **kwargs)
-        except socket.gaierror, e:
-            raise idli.IdliException("Error connecting to trac server " + trac_server_url() + ".\nCheck your config file and make sure the path is correct: " + cfg.local_config_filename() + ".\n\n" + unicode(e))
-        except socket.error, e:
-            raise idli.IdliException("Error connecting to trac server " + trac_server_url() + ".\nCheck your config file and make sure the path is correct: " + cfg.local_config_filename() + ".\n\n" + unicode(e))
-        except xmlrpclib.Fault, e:
+        except socket.gaierror as e:
+            raise idli.IdliException("Error connecting to trac server " + trac_server_url() + ".\nCheck your config file and make sure the path is correct: " + cfg.local_config_filename() + ".\n\n" + str(e))
+        except socket.error as e:
+            raise idli.IdliException("Error connecting to trac server " + trac_server_url() + ".\nCheck your config file and make sure the path is correct: " + cfg.local_config_filename() + ".\n\n" + str(e))
+        except xmlrpc.client.Fault as e:
             if e.faultCode == 403:
                 raise idli.IdliException("Trac's permissions are not set correctly. Run\n $ trac-admin TRACDIR permission add authenticated XML_RPC\nto enable XML_RPC permissions (which are required by idli).")
             else:
-                raise idli.IdliException("Error connecting to trac server " + trac_server_url() + ".\nCheck your config file and make sure the path is correct: " + cfg.local_config_filename() + ".\n\n" + unicode(e))
-        except xmlrpclib.ProtocolError, e:
-            raise idli.IdliException("Protocol error. This probably means that the XmlRpc plugin for trac is not enabled. Follow the inunicodeuctions here to install it:\nhttp://trac-hacks.org/wiki/XmlRpcPlugin\n\n"+unicode(e))
+                raise idli.IdliException("Error connecting to trac server " + trac_server_url() + ".\nCheck your config file and make sure the path is correct: " + cfg.local_config_filename() + ".\n\n" + str(e))
+        except xmlrpc.client.ProtocolError as e:
+            raise idli.IdliException("Protocol error. This probably means that the XmlRpc plugin for trac is not enabled. Follow the inunicodeuctions here to install it:\nhttp://trac-hacks.org/wiki/XmlRpcPlugin\n\n"+str(e))
     return __wrapped
 
 class TracBackend(idli.Backend):
@@ -49,7 +49,7 @@ class TracBackend(idli.Backend):
             ticket_id_list = self.ticket_api().query("status!=closed")
         else:
             ticket_id_list = self.ticket_api().query("status=closed")
-        multicall = xmlrpclib.MultiCall(self.connection()) # We try to get actual tickets in one http request
+        multicall = xmlrpc.client.MultiCall(self.connection()) # We try to get actual tickets in one http request
         for ticket in ticket_id_list:
             multicall.ticket.get(ticket)
         issues = [self.__convert_issue(t) for t in multicall()]
@@ -94,7 +94,7 @@ class TracBackend(idli.Backend):
 
     def connection(self):
         if (self.__connection is None):
-            self.__connection = xmlrpclib.ServerProxy(trac_xml_url())
+            self.__connection = xmlrpc.client.ServerProxy(trac_xml_url())
         return self.__connection
 
     def path(self):
@@ -110,7 +110,7 @@ class TracBackend(idli.Backend):
         return self.get_config("password")
 
     def __convert_comment(self, c, issue):
-        return idli.IssueComment(issue, unicode(c[1]), "", unicode(c[4]), date=c[0])
+        return idli.IssueComment(issue, str(c[1]), "", str(c[4]), date=c[0])
 
     def __convert_issue(self, t):
         issue_id = t[0]
@@ -121,7 +121,7 @@ class TracBackend(idli.Backend):
         status = True
         if i['status'] == "closed":
             status = False
-        return idli.Issue(i["summary"], i["description"], unicode(issue_id), i['reporter'],
+        return idli.Issue(i["summary"], i["description"], str(issue_id), i['reporter'],
                           status, num_comments = 0, create_time=self.__convert_date(t[1]),
                           last_modified = self.__convert_date(t[2]), owner=owner)
 
@@ -140,7 +140,7 @@ def __http_protocol():
             return "https://"
         else:
             return "http://"
-    except IdliMissingConfigException, e:
+    except IdliMissingConfigException as e:
         return "http://"
 
 def trac_server_url():

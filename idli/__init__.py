@@ -9,7 +9,7 @@ _status_mapping = {"open" : True,
 def set_status_mapping(d):
     global _status_mapping
     _status_mapping = {}
-    for k in d.keys():
+    for k in list(d.keys()):
         _status_mapping[k.lower()] = d[k]
 
 def get_status_mapping():
@@ -32,7 +32,7 @@ class Issue(object):
     def __parse_status(self, status):
         if (status.__class__ == bool):
             return status
-        if (status.__class__ == str or status.__class__ == unicode):
+        if (status.__class__ == str or status.__class__ == str):
             return get_status_mapping()[status.lower()]
 
     def __str__(self):
@@ -53,24 +53,24 @@ class Backend(object):
 
     def initialize(self):
         section_name = self.config_section or self.name
-        print "Initializing " + self.name + " project."
+        print("Initializing " + self.name + " project.")
         import idli.config as cfg
         for (name, help) in self.init_names:
             cfg.set_config_value(section_name, name, self.args.__dict__[name], global_val=False)
         cfg.set_config_value("project", "type", self.name, global_val=False)
-        print "Wrote configuration to " + cfg.local_config_filename()
+        print("Wrote configuration to " + cfg.local_config_filename())
 
     def configure(self):
         section_name = self.config_section or self.name
-        print "Configuring backend  " + self.name
+        print("Configuring backend  " + self.name)
         import idli.config as cfg
         for (name,help) in self.config_names:
             cfg.set_config_value(section_name, name, self.args.__dict__[name], global_val=not self.args.local_only)
         cfg.set_config_value("project", "type", self.name, global_val=not self.args.local_only)
         if (not self.args.local_only):
-            print "Wrote configuration to " + cfg.global_config_filename()
+            print("Wrote configuration to " + cfg.global_config_filename())
         else:
-            print "Added local configuration to " + cfg.global_config_filename()
+            print("Added local configuration to " + cfg.global_config_filename())
 
     def add_issue(self, title, body, tags=[]):
         raise IdliNotImplementedException("add_issue is not implemented by this backend.")

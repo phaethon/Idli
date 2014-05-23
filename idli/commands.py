@@ -63,7 +63,7 @@ class InitializeCommand(Command):
 
     def run(self):
         self.backend.initialize()
-        print "Configuration written to " + config.local_config_filename()
+        print("Configuration written to " + config.local_config_filename())
 
 init_parser = __register_command(InitializeCommand, help="Initialize a project")
 init_subparser = init_parser.add_subparsers(dest="backend_name")
@@ -89,7 +89,7 @@ class ListCommand(Command):
         self.print_issue_list(issues, self.args.limit)
 
     def __truncate_ljust_string(self, s, l, no_truncate=False):
-        s = unicode(s)
+        s = str(s)
         if len(s) <= l or no_truncate:
             return s.ljust(l)
         else:
@@ -110,11 +110,11 @@ class ListCommand(Command):
 
     def print_issue_list(self, issues, limit=None):
         """Print list of issues to stdout."""
-        print self.__format_issue_line("ID", "date", "title", "creator", "owner", "# comments", True)
+        print(self.__format_issue_line("ID", "date", "title", "creator", "owner", "# comments", True))
         if (limit is None):
             limit = len(issues)
         for i in issues[0:limit]:
-            print self.__format_issue_line(i.id, i.create_time, i.title, i.creator, i.owner or "", i.num_comments)
+            print(self.__format_issue_line(i.id, i.create_time, i.title, i.creator, i.owner or "", i.num_comments))
 
 list_parser = __register_command(ListCommand, help="Print a list of issues")
 
@@ -139,8 +139,8 @@ class AddIssueCommand(Command):
         title, body = self.get_title_body()
         tags = [t for t in self.args.tags.split(",") if t] # Filter out any empty strings
         issue = self.backend.add_issue(title, body, tags=tags)
-        print "Issue added!"
-        print
+        print("Issue added!")
+        print()
         util.print_issue(issue[0], issue[1])
 
     def get_title_body(self):
@@ -168,8 +168,8 @@ class AddCommentCommand(Command):
             if (exit_status != 0):
                 raise idli.IdliException("Operation cancelled.")
         self.backend.add_comment(self.args.id, message)
-        print "Comment added!"
-        print
+        print("Comment added!")
+        print()
         issue, comments = self.backend.get_issue(self.args.id)
         util.print_issue(issue, comments)
 
@@ -191,8 +191,8 @@ class ResolveIssueCommand(Command):
             raise idli.IdliException("Operation cancelled.")
         issue = self.backend.resolve_issue(self.args.id, status = self.args.state, message = message)
         issue, comments = self.backend.get_issue(self.args.id)
-        print "Issue state changed to " + str(self.args.state)
-        print
+        print("Issue state changed to " + str(self.args.state))
+        print()
         util.print_issue(issue, comments)
 
 resolve_issue_parser = __register_command(ResolveIssueCommand, help="Resolve an issue")
@@ -238,8 +238,8 @@ class AssignIssueCommand(Command):
             raise idli.IdliException("Operation cancelled.")
         issue = self.backend.assign_issue(self.args.id, user=self.args.user, message = message)
         issue, comments = self.backend.get_issue(self.args.id)
-        print "Issue " + self.args.id + " assigned to " + unicode(self.args.user)
-        print
+        print("Issue " + self.args.id + " assigned to " + str(self.args.user))
+        print()
         util.print_issue(issue, comments)
 
 assign_issue_parser = __register_command(AssignIssueCommand, help="Assign issue to user.")
@@ -247,9 +247,11 @@ assign_issue_parser = __register_command(AssignIssueCommand, help="Assign issue 
 def run_command():
     parsed = main_parser.parse_args()
     cmd_arg = parsed.command
+    if not cmd_arg:
+        cmd_arg = 'list'
     command = commands[cmd_arg]
     command_runner = command(parsed)
     try:
         result = command_runner.run()
-    except idli.IdliException, e:
-        print e.value
+    except idli.IdliException as e:
+        print(e.value)

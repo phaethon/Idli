@@ -1,4 +1,4 @@
-from ConfigParser import ConfigParser, NoSectionError
+from configparser import ConfigParser, NoSectionError
 import os
 import argparse
 import idli
@@ -28,7 +28,7 @@ def local_config_filename():
 
 def global_config_file():
     open(global_config_filename(),'w').close() # Equivalent to touching the file, make sure it exists first
-    return open(global_config_filename(),'r+w')
+    return open(global_config_filename(),'r+')
 
 global_cfg = ConfigParser()
 local_cfg = ConfigParser()
@@ -56,12 +56,12 @@ def set_config_value(section, name, value, global_val=True):
 
 #Try to load configuration files. This need not succeed.
 try:
-    global_cfg.readfp(open(global_config_filename(), "r+w"))
-except IOError, e:
+    global_cfg.readfp(open(global_config_filename(), "r+"))
+except IOError as e:
     pass # If config files don't exist, don't worry about it yet
 try:
-    local_cfg.readfp(open(local_config_filename(), 'r+w'))
-except IOError, e:
+    local_cfg.readfp(open(local_config_filename(), 'r+'))
+except IOError as e:
     pass # If config files don't exist, don't worry about it yet
 
 if __name__=="__main__":

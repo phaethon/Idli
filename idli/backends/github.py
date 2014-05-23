@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
-import urllib
-import urllib2
+import urllib.request, urllib.parse, urllib.error
+import urllib.request, urllib.error, urllib.parse
 import json
 import datetime
 import requests
@@ -19,21 +19,21 @@ class HttpRequestException(Exception):
         self.status_code = status_code
 
     def __unicode__(self):
-        return "HttpError: " + unicode(self.status_code) + ", " + unicode(self.value)
+        return "HttpError: " + str(self.status_code) + ", " + str(self.value)
 
 def catch_url_error(func):
     def wrapped_func(*args, **kwargs):
         try:
             return func(*args, **kwargs)
-        except HttpRequestException, e:
-            raise idli.IdliException("Could not connect to github. Error: " + unicode(e))
+        except HttpRequestException as e:
+            raise idli.IdliException("Could not connect to github. Error: " + str(e))
     return wrapped_func
 
 def catch_HTTPError(func):
     def wrapped_func(self, *args, **kwargs):
         try:
             return func(self, *args, **kwargs)
-        except HttpRequestException, e:
+        except HttpRequestException as e:
             if (e.status_code == 401):
                 raise idli.IdliException("Authentication failed.\n\nCheck your idli configuration. The most likely cause is incorrect values for 'user' or 'password' variables in the [Github] section of the configuration files:\n    " + cfg.local_config_filename() + "\n    " + cfg.global_config_filename() + ".\n\nMake sure you check both files - the values in " + cfg.local_config_filename() + " will override the values in " + cfg.global_config_filename() + "." + "\n\n" + str(e))
             if (e.status_code == 404):
@@ -45,7 +45,7 @@ def catch_missing_config(func):
     def wrapped_func(self, *args, **kwargs):
         try:
             return func(self, *args, **kwargs)
-        except cfg.IdliMissingConfigException, e:
+        except cfg.IdliMissingConfigException as e:
             raise idli.IdliException("You must configure idli for github first. Run 'idli configure github' for options.")
     return wrapped_func
 
@@ -130,7 +130,7 @@ class GithubBackend(idli.Backend):
         try:
             issue_as_json = json.loads(self.__url_request(issue_url))
             comments_as_json = json.loads(self.__url_request(comment_url))
-        except urllib2.HTTPError, e:
+        except urllib.error.HTTPError as e:
             self.validate()
             raise idli.IdliException("Could not find issue with id '" + issue_id + "'")
 
@@ -172,18 +172,18 @@ class GithubBackend(idli.Backend):
     def __validate_user(self):
         test_url = github_base_api_url + "user/show/" + self.repo_owner()
         try:
-            result = json.loads(urllib2.urlopen(test_url).read())
+            result = json.loads(urllib.request.urlopen(test_url).read())
             return result["user"]
-        except urllib2.HTTPError, e:
+        except urllib.error.HTTPError as e:
             raise idli.IdliException("Can not find user " + self.repo_owner() + " on github.")
 
     @catch_url_error
     def __validate_repo(self):
         test_url = github_base_api_url + "repos/show/" + self.repo_owner() + "/" + self.repo()
         try:
-            result = json.loads(urllib2.urlopen(test_url).read())
+            result = json.loads(urllib.request.urlopen(test_url).read())
             return result["repository"]
-        except urllib2.HTTPError, e:
+        except urllib.error.HTTPError as e:
             raise idli.IdliException("Can not find repository " + self.repo() + " on github.")
 
     #Utilities

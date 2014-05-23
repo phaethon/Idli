@@ -19,7 +19,7 @@ class HttpRequestException(Exception):
         self.body = body
 
     def __unicode__(self):
-        return "HttpError: " + unicode(self.status_code) + ", " + unicode(self.value) + ", " + unicode(self.body)
+        return "HttpError: " + str(self.status_code) + ", " + str(self.value) + ", " + str(self.body)
 
     def __str__(self):
         return "HttpError: " + str(self.status_code) + ", " + str(self.value) + ", " + self.body
@@ -74,7 +74,7 @@ class RedmineBackend(idli.Backend):
         result = json.loads(self.__url_request("/issues/"+str(issue_id)+".json", params={ 'include' : 'journals' }))
         issue = self.__parse_issue(result['issue'])
         journals = result['issue']['journals']
-        comment_result = [ self.__parse_comment(issue, j) for j in journals if j.has_key('notes') ]
+        comment_result = [ self.__parse_comment(issue, j) for j in journals if 'notes' in j ]
         return (issue, comment_result)
 
     def add_issue(self, title, body, tags=[]):
@@ -123,7 +123,7 @@ class RedmineBackend(idli.Backend):
 
     def __parse_issue(self, i):
         issue = idli.Issue(i['subject'], i['description'], i['id'], i['author']['name'], status=i['status']['name'], create_time=self.__parse_date(i['created_on']))
-        if i.has_key('assigned_to'):
+        if 'assigned_to' in i:
             issue.owner = i['assigned_to']['name']
         return issue
 
@@ -167,7 +167,7 @@ class RedmineBackend(idli.Backend):
             cfg.set_config_value(self.config_section, "last_status_list", json.dumps(result), global_val=False)
             cfg.set_config_value(self.config_section, "last_status_list_time", time.time())
             idli.set_status_mapping(result)
-        except HttpRequestException, e:
+        except HttpRequestException as e:
             mapping = { 'New' : True, 'Closed' : False, 'In Progress' : True, 'Rejected' : False, 'Resolved' : False, 'Feedback' : True }
             cfg.set_config_value(self.config_section, "last_status_list", json.dumps(mapping), global_val=False)
             cfg.set_config_value(self.config_section, "last_status_list_time", float(time.time()), global_val=False)

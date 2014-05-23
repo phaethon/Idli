@@ -4,18 +4,18 @@ from distutils.core import setup
 try:
     import argparse
 except ImportError:
-    print "Module argparse is required by idl. Please install it and try again."
+    print("Module argparse is required by idl. Please install it and try again.")
 
 try:
     import json
 except ImportError:
-    print "Module json is required by idl. Please install it and try again."
+    print("Module json is required by idl. Please install it and try again.")
 
 try:
-    import urllib
-    import urllib2
+    import urllib.request, urllib.parse, urllib.error
+    import urllib.request, urllib.error, urllib.parse
 except ImportError:
-    print "Modules urllib and urllib2 are required by idl. Please install them and try again."
+    print("Modules urllib and urllib2 are required by idl. Please install them and try again.")
 
 
 

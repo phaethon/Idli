@@ -32,20 +32,12 @@ Standard python install::
     $ python setup.py build
     $ python setup.py install
 
-Make sure you have the necessary dependencies installed. If you have
-python 2.7 or greater, you already have them.
+Make sure you have the necessary dependencies installed.
 
 Dependencies
 ------------
 
-Idli requires the following modules::
-
-    argparse
-    json
-    urllib, urllib2
-
-Note that argparse comes installed with Python 2.7 or greater, and json with Python 2.6 or greater.
-There is a good chance you already have these libraries.
+...section to be updated for Python 3.
 
 Usage
 =====

@@ -12,6 +12,11 @@ except ImportError:
     print("Module json is required by idl. Please install it and try again.")
 
 try:
+    import requests
+except ImportError:
+    print("Module requests is required by idl. Please install it and try again.")
+
+try:
     import urllib.request, urllib.parse, urllib.error
     import urllib.request, urllib.error, urllib.parse
 except ImportError:

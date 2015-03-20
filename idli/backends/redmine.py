@@ -129,9 +129,9 @@ class RedmineBackend(idli.Backend):
                     }
         auth = (self.token(), "null")
         if method == 'post':
-            response = requests.post(self.base_url() + suffix, auth=auth, data=json.dumps(data), headers=headers)
+            response = requests.post(self.base_url() + suffix, auth=auth, data=json.dumps(data), headers=headers, verify=self.verify_ssl())
         if method == 'put':
-            response = requests.put(self.base_url() + suffix, auth=auth, data=json.dumps(data), headers=headers)
+            response = requests.put(self.base_url() + suffix, auth=auth, data=json.dumps(data), headers=headers, verify=self.verify_ssl())
         if (response.status_code - (response.status_code % 100)) != 200: #200 responses are all legitimate
             raise HttpRequestException("HTTP error", response.status_code, response.content)
         return response.content.decode('utf-8')
@@ -140,7 +140,7 @@ class RedmineBackend(idli.Backend):
     def __url_request(self, suffix, params={}):
         headers = { 'Content-Type' : 'application/json' }
         auth = (self.token(), "null")
-        response = requests.get(self.base_url() + suffix, auth=auth, params=params, headers=headers)
+        response = requests.get(self.base_url() + suffix, auth=auth, params=params, headers=headers, verify=self.verify_ssl())
         if (response.status_code - (response.status_code % 100)) != 200: #200 responses are all legitimate
             raise HttpRequestException("HTTP error", response.status_code, response.content)
         return response.content.decode('utf-8')

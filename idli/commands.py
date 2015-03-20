@@ -66,6 +66,7 @@ class InitializeCommand(Command):
         print("Configuration written to " + config.local_config_filename())
 
 init_parser = __register_command(InitializeCommand, help="Initialize a project")
+init_parser.add_argument('--no-verify', help="do not verify TLS certificates", action="store_true")
 init_subparser = init_parser.add_subparsers(dest="backend_name")
 
 class ListCommand(Command):

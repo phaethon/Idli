@@ -55,8 +55,13 @@ class Backend(object):
         section_name = self.config_section or self.name
         print("Initializing " + self.name + " project.")
         import idli.config as cfg
+
+        if(self.args.no_verify):
+            cfg.set_config_value(section_name, 'verify_ssl', "False", global_val=False)
+
         for (name, help) in self.init_names:
             cfg.set_config_value(section_name, name, self.args.__dict__[name], global_val=False)
+
         cfg.set_config_value("project", "type", self.name, global_val=False)
         print("Wrote configuration to " + cfg.local_config_filename())
 
@@ -103,6 +108,26 @@ class Backend(object):
 
     def username(self):
         raise IdliNotImplementedException("username is not implemented by this backend.")
+
+    def verify_ssl(self):
+        try:
+            if self._verify_ssl is not None:
+                return self._verify_ssl
+        except AttributeError:
+            self._verify_ssl = True
+
+        try:
+            cfg_verifssl = self.get_config("verify_ssl")
+
+            if(cfg_verifssl == "False"):
+                self._verify_ssl = False
+            else:
+                self._verify_ssl = True
+        except:
+            self._verify_ssl=True
+        
+        return self._verify_ssl
+
 
     #Utilities
     def get_config(self, name):

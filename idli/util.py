@@ -17,7 +17,7 @@ def get_title_body_from_editor(title, body, prefix='idli-'):
     return (title, body, exit_status)
 
 def get_string_from_editor(base_string, prefix='idli-'):
-    tf = tempfile.NamedTemporaryFile('w+b',prefix=prefix)
+    tf = tempfile.NamedTemporaryFile('w+',prefix=prefix)
     tf.write(base_string)
     tf.seek(0)
     exit_status = subprocess.call(get_editor_name_as_list() + [tf.name])

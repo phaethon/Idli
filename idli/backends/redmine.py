@@ -93,6 +93,11 @@ class RedmineBackend(idli.Backend):
         comment_result = [ self.__parse_comment(issue, j) for j in journals if 'notes' in j ]
         return (issue, comment_result)
 
+    def get_user(self, user_id):
+        result = json.loads(self.__url_request("/users/"+str(user_id)+".json", params={ 'include' : 'groups' }))
+        user = self.__parse_user(result['user'])
+        return user
+
     def add_issue(self, title, body, tags=[]):
         data = { "issue" : { 'project_id' : self.project_id(),
                              'subject' : title,

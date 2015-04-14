@@ -124,7 +124,7 @@ class RedmineBackend(idli.Backend):
     def assign_issue(self, issue_id, user, message):
 
         # Find the user matching user
-        users = users_list()
+        users = self.users_list()
         possible_users = []
         definitive_user = None
         for u in users:

@@ -71,7 +71,7 @@ class RedmineBackend(idli.Backend):
         return [self.__parse_issue(i) for i in json_results]
 
     # Get the users list
-    # TODO filter by group or name
+    # TODO filter with groups
     def users_list(self):
 
         # Get the first 100 users

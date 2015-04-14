@@ -153,8 +153,8 @@ class RedmineBackend(idli.Backend):
                 raise Exception("Multiple users matching '" + user + "'")
 
         # Do the issue update API request
-        data = { 'issue' : { 'notes' : message, 'assigned_to_id' : u.id, } }
-        result = self.__url_post('/issues/' + u.id + '.json', data=data, method='put')
+        data = { 'issue' : { 'notes' : message, 'assigned_to_id' : definitive_user.id, } }
+        result = self.__url_post('/issues/' + str(issue_id) + '.json', data=data, method='put')
         return self.get_issue(issue_id)
 
 

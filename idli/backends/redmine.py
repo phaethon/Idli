@@ -129,33 +129,38 @@ class RedmineBackend(idli.Backend):
     def assign_issue(self, issue_id, user, message):
 
         # Find the user matching user
-        users = self.users_list()
-        possible_users = []
         definitive_user = None
-        for u in users:
-            if ( str(user) == u.id or
-                 str(user) == u.mail or
-                 str(user) == u.shortname or
-                 str(user) == u.longname ):
 
-                definitive_user = u
-                break
+        # If user is 'me', we assume we mean the current user
+        if user == "me":
+            definitive_user = self.get_user("current")
+        else:
+            users = self.users_list()
+            possible_users = []
+            for u in users:
+                if ( str(user) == u.id or
+                     str(user) == u.mail or
+                     str(user) == u.shortname or
+                     str(user) == u.longname ):
 
-            if ( str(user) in u.mail or
-                 str(user) in u.shortname or
-                 str(user) in u.longname ):
-                possible_users += [ u ]
+                    definitive_user = u
+                    break
 
-        # Check that we found only one matching user
-        if definitive_user is None:
-            if len(possible_users) == 1:
-                definitive_user = possible_users[0]
+                if ( str(user) in u.mail or
+                     str(user) in u.shortname or
+                     str(user) in u.longname ):
+                    possible_users += [ u ]
 
-            elif len(possible_users) == 0:
-                raise Exception("No user matching '" + user + "'")
+            # Check that we found only one matching user
+            if definitive_user is None:
+                if len(possible_users) == 1:
+                    definitive_user = possible_users[0]
 
-            else:
-                raise Exception("Multiple users matching '" + user + "'")
+                elif len(possible_users) == 0:
+                    raise Exception("No user matching '" + user + "'")
+
+                else:
+                    raise Exception("Multiple users matching '" + user + "'")
 
         # Do the issue update API request
         data = { 'issue' : { 'notes' : message, 'assigned_to_id' : definitive_user.id, } }

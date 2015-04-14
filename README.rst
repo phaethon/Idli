@@ -29,8 +29,8 @@ Standard python install::
 
     $ git clone git@github.com:stucchio/Idli.git
     $ cd Idli
-    $ python setup.py build
-    $ python setup.py install
+    $ python3 setup.py build
+    $ python3 setup.py install
 
 Make sure you have the necessary dependencies installed.
 

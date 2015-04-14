@@ -54,7 +54,7 @@ class RedmineBackend(idli.Backend):
         return self.__username or self.get_config("username")
 
     def issue_list(self, state=True):
-        params = { 'project_id' : self.project_id(), 'limit' : 100,  'status_id' : state}
+        params = { 'project_id' : self.project_id(), 'limit' : 100,  'status_id' : state, }
         issues = []
         result = json.loads(self.__url_request("/issues.json", params = params) )
         total_results = result['total_count']
@@ -185,6 +185,7 @@ class RedmineBackend(idli.Backend):
         #tz_delta = datetime.timedelta(hours=int(d[-6:])/100) ???
         return datetime.datetime.strptime(d[0:19], self.DATE_FORMAT)# + tz_delta
 
+    # Parse an issue from Redmine's json to idli 'Issue'
     def __parse_issue(self, i):
         issue = idli.Issue(
                 i['subject'],
@@ -197,8 +198,13 @@ class RedmineBackend(idli.Backend):
         if 'assigned_to' in i:
             issue.owner = i['assigned_to']['name']
 
+        if 'journals' in i:
+            print("journals")
+            issue.num_comment = len(i['journals'])
+
         return issue
 
+    # Parse a user from Redmine's json to idli 'User'
     def __parse_user(self, u):
         user = idli.User(
                 u['id'],

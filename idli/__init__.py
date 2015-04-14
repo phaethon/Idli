@@ -16,6 +16,25 @@ def get_status_mapping():
     global _status_mapping
     return _status_mapping
 
+class User(object):
+    def __init__(self, id, mail, shortname=None, longname=None):
+
+        self.id = str(id)
+        self.mail = str(mail)
+
+        if shortname is not None:
+            self.shortname = str(shortname)
+        else:
+            self.shortname = str(self.id)
+
+        if longname is not None:
+            self.longname = str(longname)
+        else:
+            self.longname = str(self.shortname)
+
+        def __str__(self):
+            return "User(" + self.id + ", " + self.shortname + ", " + self.longname + ")"
+
 class Issue(object):
     def __init__(self, title, body, id, creator, status = True, num_comments = None, create_time=None, last_modified=None, owner=None, tags=[]):
         self.title = title
@@ -117,3 +136,5 @@ class IdliException(Exception):
 
 class IdliNotImplementedException(IdliException):
     pass
+
+# vim: set sw=4 ts=4 expandtab:

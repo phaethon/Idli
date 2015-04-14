@@ -67,6 +67,25 @@ class RedmineBackend(idli.Backend):
 
         return [self.__parse_issue(i) for i in json_results]
 
+    # Get the users list
+    # TODO filter with groups
+    def users_list(self):
+
+        # Get the first 100 users
+        params = { 'project_id' : self.project_id(), 'limit' : 100 }
+        result = json.loads(self.__url_request("/users.json", params=params) )
+        total_results = result['total_count']
+        json_results = result['users']
+
+        # Get the rest (>100 users)
+        while (len(json_results) < total_results):
+            params = { 'project_id' : self.project_id(), 'limit' : 100, 'offset' : len(json_results) }
+            result = json.loads(self.__url_request("/users.json", params = params) )
+            json_results += result['users']
+            total_results = result['total_count']
+
+        return [self.__parse_user(u) for u in json_results]
+
     def get_issue(self, issue_id, get_comments=True):
         result = json.loads(self.__url_request("/issues/"+str(issue_id)+".json", params={ 'include' : 'journals' }))
         issue = self.__parse_issue(result['issue'])
@@ -101,6 +120,44 @@ class RedmineBackend(idli.Backend):
         result = self.__url_post('/issues/' + str(issue_id) + '.json', data=data, method='put')
         return self.get_issue(issue_id)
 
+    # Backend override
+    def assign_issue(self, issue_id, user_name, body):
+
+        # Find the user matching user_name
+        users = users_list()
+        possible_users = []
+        definitive_user = None
+        for u in users:
+            if ( str(user_name) == u.id or
+                 str(user_name) == u.mail or
+                 str(user_name) == u.shortname or
+                 str(user_name) == u.longname ):
+
+                definitive_user = u
+                break
+
+            if ( str(user_name) in u.mail or
+                 str(user_name) in u.shortname or
+                 str(user_name) in u.longname ):
+                possible_users += [ u ]
+
+        # Check that we found only one matching user
+        if definitive_user is None:
+            if len(possible_users) == 1:
+                definitive_user = possible_users[0]
+
+            elif len(possible_users) == 0:
+                raise Exception("No user matching '" + user_name + "'")
+
+            else:
+                raise Exception("Multiple users matching '" + user_name + "'")
+
+        # Do the issue update API request
+        data = { 'issue' : { 'notes' : body, 'assigned_to_id' : u.id, } }
+        result = self.__url_post('/issues/' + u.id + '.json', data=data, method='put')
+        return self.get_issue(issue_id)
+
+
     def __parse_comment(self, issue, journal):
         return idli.IssueComment(issue=issue, creator=journal['user']['name'], body=journal['notes'], date=self.__parse_date(journal['created_on']), title="")
 
@@ -119,10 +176,26 @@ class RedmineBackend(idli.Backend):
         return datetime.datetime.strptime(d[0:19], self.DATE_FORMAT)# + tz_delta
 
     def __parse_issue(self, i):
-        issue = idli.Issue(i['subject'], i['description'], i['id'], i['author']['name'], status=i['status']['name'], create_time=self.__parse_date(i['created_on']))
+        issue = idli.Issue(
+                i['subject'],
+                i['description'],
+                i['id'],
+                i['author']['name'],
+                status=i['status']['name'],
+                create_time=self.__parse_date(i['created_on']) )
+
         if 'assigned_to' in i:
             issue.owner = i['assigned_to']['name']
+
         return issue
+
+    def __parse_user(self, u):
+        user = idli.User(
+                u['id'],
+                u['mail'],
+                u['login'],
+                u['firstname'] + " " + u['lastname'] )
+        return user
 
     def __url_post(self, suffix, data={}, method='post'):
         headers = { 'Content-Type' : 'application/json',
@@ -175,3 +248,5 @@ class RedmineBackend(idli.Backend):
             idli.set_status_mapping(mapping)
         except cfg.IdliMissingConfigException:
             pass
+
+# vim: set sw=4 ts=4 expandtab:

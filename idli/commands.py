@@ -235,8 +235,8 @@ class AssignIssueCommand(Command):
         message = self.args.message
         if (message is None):
             message, exit_status = util.get_string_from_editor("Please resolve this issue.", prefix='idli-assign-')
-        if (exit_status != 0):
-            raise idli.IdliException("Operation cancelled.")
+            if (exit_status != 0):
+                raise idli.IdliException("Operation cancelled.")
         issue = self.backend.assign_issue(self.args.id, user=self.args.user, message = message)
         issue, comments = self.backend.get_issue(self.args.id)
         print("Issue " + self.args.id + " assigned to " + str(self.args.user))

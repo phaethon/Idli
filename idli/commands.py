@@ -101,7 +101,7 @@ class ListCommand(Command):
             date_str = date
         else:
             date_str = date.strftime(self.date_format)
-        return id.ljust(6) + " " + self.__truncate_ljust_string(date_str,10) + "  " + self.__truncate_ljust_string(title, 35) + "  " + self.__truncate_ljust_string(creator,12) + "  " + self.__truncate_ljust_string(owner, 12) + self.__truncate_ljust_string(num_comments, 5, is_title_line)
+        return id.ljust(6) + " " + self.__truncate_ljust_string(date_str,10) + "  " + self.__truncate_ljust_string(title, 35) + "  " + self.__truncate_ljust_string(creator,12) + "  " + self.__truncate_ljust_string(owner, 12) + "  " + self.__truncate_ljust_string(num_comments, 5, is_title_line)
 
     def __state(self):
         if (self.args.state == "open"):

@@ -32,8 +32,8 @@ class User(object):
         else:
             self.longname = str(self.shortname)
 
-        def __str__(self):
-            return "User(" + self.id + ", " + self.shortname + ", " + self.longname + ")"
+    def __str__(self):
+        return "User(" + self.id + ", " + self.mail + ", " + self.shortname + ", " + self.longname + ")"
 
 class Issue(object):
     def __init__(self, title, body, id, creator, status = True, num_comments = None, create_time=None, last_modified=None, owner=None, tags=[]):

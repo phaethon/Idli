@@ -121,24 +121,24 @@ class RedmineBackend(idli.Backend):
         return self.get_issue(issue_id)
 
     # Backend override
-    def assign_issue(self, issue_id, user_name, body):
+    def assign_issue(self, issue_id, user, message):
 
-        # Find the user matching user_name
+        # Find the user matching user
         users = users_list()
         possible_users = []
         definitive_user = None
         for u in users:
-            if ( str(user_name) == u.id or
-                 str(user_name) == u.mail or
-                 str(user_name) == u.shortname or
-                 str(user_name) == u.longname ):
+            if ( str(user) == u.id or
+                 str(user) == u.mail or
+                 str(user) == u.shortname or
+                 str(user) == u.longname ):
 
                 definitive_user = u
                 break
 
-            if ( str(user_name) in u.mail or
-                 str(user_name) in u.shortname or
-                 str(user_name) in u.longname ):
+            if ( str(user) in u.mail or
+                 str(user) in u.shortname or
+                 str(user) in u.longname ):
                 possible_users += [ u ]
 
         # Check that we found only one matching user
@@ -147,13 +147,13 @@ class RedmineBackend(idli.Backend):
                 definitive_user = possible_users[0]
 
             elif len(possible_users) == 0:
-                raise Exception("No user matching '" + user_name + "'")
+                raise Exception("No user matching '" + user + "'")
 
             else:
-                raise Exception("Multiple users matching '" + user_name + "'")
+                raise Exception("Multiple users matching '" + user + "'")
 
         # Do the issue update API request
-        data = { 'issue' : { 'notes' : body, 'assigned_to_id' : u.id, } }
+        data = { 'issue' : { 'notes' : message, 'assigned_to_id' : u.id, } }
         result = self.__url_post('/issues/' + u.id + '.json', data=data, method='put')
         return self.get_issue(issue_id)
 

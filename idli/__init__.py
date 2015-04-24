@@ -16,6 +16,25 @@ def get_status_mapping():
     global _status_mapping
     return _status_mapping
 
+class User(object):
+    def __init__(self, id, mail, shortname=None, longname=None):
+
+        self.id = str(id)
+        self.mail = str(mail)
+
+        if shortname is not None:
+            self.shortname = str(shortname)
+        else:
+            self.shortname = str(self.id)
+
+        if longname is not None:
+            self.longname = str(longname)
+        else:
+            self.longname = str(self.shortname)
+
+    def __str__(self):
+        return "User(" + self.id + ", " + self.mail + ", " + self.shortname + ", " + self.longname + ")"
+
 class Issue(object):
     def __init__(self, title, body, id, creator, status = True, num_comments = None, create_time=None, last_modified=None, owner=None, tags=[]):
         self.title = title
@@ -55,8 +74,13 @@ class Backend(object):
         section_name = self.config_section or self.name
         print("Initializing " + self.name + " project.")
         import idli.config as cfg
+
+        if(self.args.no_verify):
+            cfg.set_config_value(section_name, 'verify_ssl', "False", global_val=False)
+
         for (name, help) in self.init_names:
             cfg.set_config_value(section_name, name, self.args.__dict__[name], global_val=False)
+
         cfg.set_config_value("project", "type", self.name, global_val=False)
         print("Wrote configuration to " + cfg.local_config_filename())
 
@@ -104,6 +128,26 @@ class Backend(object):
     def username(self):
         raise IdliNotImplementedException("username is not implemented by this backend.")
 
+    def verify_ssl(self):
+        try:
+            if self._verify_ssl is not None:
+                return self._verify_ssl
+        except AttributeError:
+            self._verify_ssl = True
+
+        try:
+            cfg_verifssl = self.get_config("verify_ssl")
+
+            if(cfg_verifssl == "False"):
+                self._verify_ssl = False
+            else:
+                self._verify_ssl = True
+        except:
+            self._verify_ssl=True
+        
+        return self._verify_ssl
+
+
     #Utilities
     def get_config(self, name):
         import idli.config as cfg
@@ -117,3 +161,5 @@ class IdliException(Exception):
 
 class IdliNotImplementedException(IdliException):
     pass
+
+# vim: set sw=4 ts=4 expandtab:

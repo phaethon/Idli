@@ -66,6 +66,7 @@ class InitializeCommand(Command):
         print("Configuration written to " + config.local_config_filename())
 
 init_parser = __register_command(InitializeCommand, help="Initialize a project")
+init_parser.add_argument('--no-verify', help="do not verify TLS certificates", action="store_true")
 init_subparser = init_parser.add_subparsers(dest="backend_name")
 
 class ListCommand(Command):
@@ -100,7 +101,7 @@ class ListCommand(Command):
             date_str = date
         else:
             date_str = date.strftime(self.date_format)
-        return id.ljust(6) + " " + self.__truncate_ljust_string(date_str,10) + "  " + self.__truncate_ljust_string(title, 35) + "  " + self.__truncate_ljust_string(creator,12) + "  " + self.__truncate_ljust_string(owner, 12) + self.__truncate_ljust_string(num_comments, 5, is_title_line)
+        return id.ljust(6) + " " + self.__truncate_ljust_string(date_str,10) + "  " + self.__truncate_ljust_string(title, 35) + "  " + self.__truncate_ljust_string(creator,12) + "  " + self.__truncate_ljust_string(owner, 12) + "  " + self.__truncate_ljust_string(num_comments, 5, is_title_line)
 
     def __state(self):
         if (self.args.state == "open"):
@@ -234,8 +235,8 @@ class AssignIssueCommand(Command):
         message = self.args.message
         if (message is None):
             message, exit_status = util.get_string_from_editor("Please resolve this issue.", prefix='idli-assign-')
-        if (exit_status != 0):
-            raise idli.IdliException("Operation cancelled.")
+            if (exit_status != 0):
+                raise idli.IdliException("Operation cancelled.")
         issue = self.backend.assign_issue(self.args.id, user=self.args.user, message = message)
         issue, comments = self.backend.get_issue(self.args.id)
         print("Issue " + self.args.id + " assigned to " + str(self.args.user))

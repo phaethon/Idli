@@ -1,5 +1,3 @@
-#!/usr/bin/python
-
 from datetime import datetime
 import xmlrpc.client
 import socket
@@ -25,7 +23,7 @@ def catch_socket_errors(func):
             else:
                 raise idli.IdliException("Error connecting to trac server " + trac_server_url() + ".\nCheck your config file and make sure the path is correct: " + cfg.local_config_filename() + ".\n\n" + str(e))
         except xmlrpc.client.ProtocolError as e:
-            raise idli.IdliException("Protocol error. This probably means that the XmlRpc plugin for trac is not enabled. Follow the inunicodeuctions here to install it:\nhttp://trac-hacks.org/wiki/XmlRpcPlugin\n\n"+str(e))
+            raise idli.IdliException("Protocol error. This probably means that the XmlRpc plugin for trac is not enabled. Follow the instructions here to install it:\nhttp://trac-hacks.org/wiki/XmlRpcPlugin\n\n"+str(e))
     return __wrapped
 
 class TracBackend(idli.Backend):

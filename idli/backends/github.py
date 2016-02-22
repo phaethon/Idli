@@ -1,7 +1,4 @@
-#!/usr/bin/python
-
 import urllib.request, urllib.parse, urllib.error
-import urllib.request, urllib.error, urllib.parse
 import json
 import datetime
 import requests
@@ -18,7 +15,7 @@ class HttpRequestException(Exception):
         self.value = value
         self.status_code = status_code
 
-    def __unicode__(self):
+    def __str__(self):
         return "HttpError: " + str(self.status_code) + ", " + str(self.value)
 
 def catch_url_error(func):

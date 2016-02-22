@@ -127,15 +127,12 @@ class BitbucketBackend(idli.Backend):
     @catch_url_error
     @catch_HTTPError
     def add_issue(self, title, body, tags=[]):
-        logging.debug('add_issue')
-        raise idli.IdliNotImplementedException('No writes supported yet')
+        logging.debug('add_issue, title: %s', title)
         url = self.url()
-        result = self.__url_request('post', url, {'title':title, 'body':body})
-        issue = self.__parse_issue(result['issue'])
+        result = self.__url_request('post', url, {'title': title, 'content': body})
+        issue = self.__parse_issue(result)
         if tags:
             raise idli.IdliNotImplementedException('Tagging not supported')
-            self.tag_issue(issue.id, tags)
-            issue = self.get_issue(issue.id)
         return (issue, [])
 
     @catch_missing_config
@@ -185,10 +182,9 @@ class BitbucketBackend(idli.Backend):
     @catch_url_error
     def add_comment(self, issue_id, body):
         logging.debug('add_comment, issue_id: %s', issue_id)
-        raise idli.IdliNotImplementedException('No writes supported yet')
         url = self.url(component='{issue_id}/comments', issue_id=issue_id)
-        result = self.__url_request('post', url, {'comment': body})
-        comment = self.__parse_comment(None, result['comment'])
+        result = self.__url_request('post', url, {'content': body})
+        comment = self.__parse_comment(None, result)
         return comment
 
     @catch_missing_config
@@ -196,13 +192,12 @@ class BitbucketBackend(idli.Backend):
     @catch_HTTPError
     def resolve_issue(self, issue_id, status = "closed", message = None):
         logging.debug('resolve_issue, issue_id: %s, status: %s', issue_id, status)
-        raise idli.IdliNotImplementedException('No writes supported yet')
-        self.add_comment(issue_id, message)
-        status_url = self.__resolution_code_to_url[status]
-        url = github_base_api_url + "issues/" + status_url + "/" + self.repo_owner() + "/" + self.repo() + "/" + str(issue_id)
-        issue = self.__parse_issue(self.__url_request(url)["issue"])
+        if message:
+            self.add_comment(issue_id, message)
+        url = self.url(component='{issue_id}', issue_id=issue_id)
+        response = self.__url_request('put', url, {"status": status})
+        issue = self.__parse_issue(response)
         return issue
-    __resolution_code_to_url = { "closed" : "close", "open" : "reopen" }
 
     #Validation queries
     def validate(self):

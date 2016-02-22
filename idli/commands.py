@@ -188,8 +188,8 @@ class ResolveIssueCommand(Command):
         message = self.args.message
         if (message is None):
             message, exit_status = util.get_string_from_editor("Issue resolved.\n# More details go here.", prefix='idli-resolve-')
-        if (exit_status != 0):
-            raise idli.IdliException("Operation cancelled.")
+            if (exit_status != 0):
+                raise idli.IdliException("Operation cancelled.")
         issue = self.backend.resolve_issue(self.args.id, status = self.args.state, message = message)
         issue, comments = self.backend.get_issue(self.args.id)
         print("Issue state changed to " + str(self.args.state))

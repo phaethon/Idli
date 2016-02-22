@@ -245,10 +245,11 @@ class BitbucketBackend(idli.Backend):
     def __parse_issue(self, issue_dict):
         #TODO: timezones
         create_time = self.__parse_date(issue_dict["utc_created_on"])
+        comment_count = issue_dict.get("comment_count", 0)
         #TODO: pseudotags for fields
         return idli.Issue(issue_dict["title"], issue_dict["content"],
                             issue_dict["local_id"], issue_dict["reported_by"]["username"],
-                            num_comments = issue_dict["comment_count"], status = issue_dict["status"],
+                            num_comments = comment_count, status = issue_dict["status"],
                             create_time=create_time, tags=[])
 
     def __parse_date(self, datestr):

@@ -1,5 +1,3 @@
-#!/usr/bin/python
-
 _status_mapping = {"open" : True,
                    "closed" : False,
                    "true" : True,

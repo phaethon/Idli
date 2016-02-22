@@ -1,6 +1,7 @@
 from . import github
 from . import trac
 from . import redmine
+from . import bitbucket
 import sys
 import idli.config as cfg
 from idli.commands import configure_subparser, init_subparser
@@ -42,3 +43,4 @@ def get_backend_or_fail(backend_name = None):
 register_backend(github.GithubBackend)
 register_backend(trac.TracBackend)
 register_backend(redmine.RedmineBackend)
+register_backend(bitbucket.BitbucketBackend)

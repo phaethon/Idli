@@ -15,7 +15,7 @@ class HttpRequestException(Exception):
         self.value = value
         self.status_code = status_code
 
-    def __unicode__(self):
+    def __str__(self):
         return "HttpError: " + str(self.status_code) + ", " + str(self.value)
 
 def catch_url_error(func):
